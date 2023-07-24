@@ -19,6 +19,9 @@ STATE_CHOICES = (
 class Shop(models.Model):
     name = models.CharField(max_length=50, verbose_name='Наименование магазина')
     url = models.CharField(max_length=256, null=True, blank=True, verbose_name='Адрес интернет магазина')
+    user = models.OneToOneField(User, verbose_name='Пользователь',
+                                blank=True, null=True,
+                                on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Магазин'

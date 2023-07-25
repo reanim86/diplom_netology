@@ -1,9 +1,9 @@
 import django
-from django.contrib.auth.models import User
-# from django.conf import settings
+from django.contrib.auth.models import User, AbstractUser
+from django.conf import settings
 from django.db import models
 
-# from django.contrib.auth.models import AbstractUser
+
 
 
 STATE_CHOICES = (
@@ -19,7 +19,7 @@ STATE_CHOICES = (
 class Shop(models.Model):
     name = models.CharField(max_length=50, verbose_name='Наименование магазина')
     url = models.CharField(max_length=256, null=True, blank=True, verbose_name='Адрес интернет магазина')
-    user = models.OneToOneField(User, verbose_name='Пользователь',
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name='Пользователь',
                                 blank=True, null=True,
                                 on_delete=models.CASCADE)
 
@@ -34,7 +34,7 @@ class Shop(models.Model):
 class Category(models.Model):
 
     name = models.CharField(max_length=50, verbose_name='Наименование категории')
-    shop = models.ManyToManyField(Shop, related_name='categorys')
+    shops = models.ManyToManyField(Shop, related_name='categorys')
 
     class Meta:
         verbose_name = 'Категория'
@@ -92,13 +92,14 @@ class ProductParameter(models.Model):
         verbose_name = 'Параметр'
         verbose_name_plural = 'Параметры'
 
-# class User(AbstractUser):
-#
-#     surname = models.CharField(max_length=40, null=True, blank=True, verbose_name='Фамилия')
+class User(AbstractUser):
+    company = models.CharField(verbose_name='Компания', max_length=40, blank=True)
+    position = models.CharField(verbose_name='Должность', max_length=40, blank=True)
+    surname = models.CharField(max_length=40, null=True, blank=True, verbose_name='Фамилия')
 
 class Order(models.Model):
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     dt = models.DateField(default=django.utils.timezone.now, verbose_name='Дата создания')
     status = models.CharField(verbose_name='Статус', choices=STATE_CHOICES, max_length=15)
 
@@ -109,7 +110,7 @@ class Order(models.Model):
 class Contact(models.Model):
 
     type = models.CharField(max_length=50, verbose_name='Статус')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contacts')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='contacts')
     value = models.CharField(max_length=50, verbose_name='Значение')
 
     class Meta:

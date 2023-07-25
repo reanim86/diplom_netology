@@ -21,5 +21,5 @@ from backend.views import UploadData
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('test/', UploadData.as_view())
+    path('upload/', UploadData.as_view())
 ]

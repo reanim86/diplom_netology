@@ -2,21 +2,25 @@ from pprint import pprint
 import urllib.request
 import yaml
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated
 from yaml import load as load_yaml, Loader
 from requests import get
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 
 from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User
 
 
 class UploadData(APIView):
+    permission_classes = (IsAuthenticated,)
     def post(self, request):
         url = request.data.get('url')
         stream = get(url).content
         data = yaml.safe_load(stream)
         # pprint(data)
-        shop = Shop.objects.get_or_create(name=data['shop'])
+        shop = Shop.objects.get_or_create(name=data['shop'], user=request.user)
         for category in data['categories']:
             cat = Category.objects.get_or_create(id=category['id'], name=category['name'])
             cat[0].shops.add(shop[0])
@@ -42,13 +46,33 @@ class UploadData(APIView):
 class CreateUser(APIView):
     def post(self, request):
         user = request.data
-        # print(password)
-        # user_password = User.objects.get(pk=1)
-        # print(type(password))
-        # if check_password('test', user_password.password):
-        #     return Response('Ok')
+        confirm_password = user.pop('confirm_password')
+        user_check = User.objects.filter(username=user['email'])
+        if user_check:
+            return Response('User already exist')
+        user['username'] = user['email']
+        if confirm_password == user['password']:
+            user_db = User.objects.create_user(**user)
+        else:
+            return Response("The password doesn't match")
+        token = Token.objects.create(user=user_db)
+        return Response(f'User {user["username"]} created, Token: {token}')
 
-        # # print(user_password.password)
-        return Response('bad')
+class UserEnter(APIView):
+    def post(self, request):
+        data = request.data
+        # username_check = User.objects.filter(username=data['email'])
+        # if username_check:
+        #     if check_password(data['password'], username_check[0].password):
+        #         return Response('Login is allowed')
+        #     else:
+        #         return Response('Wrong password')
+        # else:
+        #     return Response('User not found')
+        user = authenticate(username=data['email'], password=data['password'])
+        if user is None:
+            return Response('Email or password is wrong')
+        return Response('Login is allowed')
+
 
 

@@ -3,7 +3,7 @@
 @baseUrl = http://localhost:8000
 
 # Загрузить данные из магазина
-POST {{baseUrl}}/test/
+POST {{baseUrl}}/upload/
 Content-Type: application/json
 
 {

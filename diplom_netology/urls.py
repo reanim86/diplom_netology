@@ -17,9 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from backend.views import UploadData
+from backend.views import UploadData, CreateUser
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('upload/', UploadData.as_view())
+    path('upload/', UploadData.as_view()),
+    path('createuser/', CreateUser.as_view())
 ]

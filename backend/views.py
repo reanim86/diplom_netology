@@ -1,12 +1,13 @@
 from pprint import pprint
 import urllib.request
 import yaml
+from django.contrib.auth.hashers import check_password
 from yaml import load as load_yaml, Loader
 from requests import get
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter
+from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User
 
 
 class UploadData(APIView):
@@ -40,7 +41,14 @@ class UploadData(APIView):
 
 class CreateUser(APIView):
     def post(self, request):
-        passwod = request.data.get('passwod')
-        print(passwod)
+        user = request.data
+        # print(password)
+        # user_password = User.objects.get(pk=1)
+        # print(type(password))
+        # if check_password('test', user_password.password):
+        #     return Response('Ok')
+
+        # # print(user_password.password)
+        return Response('bad')
 
 

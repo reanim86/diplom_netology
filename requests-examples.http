@@ -12,9 +12,13 @@ Content-Type: application/json
 
 ###
 
-# получение статуса
-GET {{baseUrl}}/tasks/5c90c5c8-40f1-4bea-8281-1c4cb30707ea
+# Создание пользователя
+POST  {{baseUrl}}/createuser/
 Content-Type: application/json
+
+{
+  "password": "test"
+}
 
 ###
 

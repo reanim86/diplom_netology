@@ -3,6 +3,7 @@ import urllib.request
 import yaml
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import authenticate
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from yaml import load as load_yaml, Loader
 from requests import get
@@ -11,9 +12,13 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 
 from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User
+from backend.serializers import ProductSerializer
 
 
 class UploadData(APIView):
+    """
+    Загрузка yaml файла с товарами, файл передается в виде ссылки
+    """
     permission_classes = (IsAuthenticated,)
     def post(self, request):
         url = request.data.get('url')
@@ -44,6 +49,9 @@ class UploadData(APIView):
         return Response('Download is ok')
 
 class CreateUser(APIView):
+    """
+    Создание пользователя
+    """
     def post(self, request):
         user = request.data
         confirm_password = user.pop('confirm_password')
@@ -59,6 +67,9 @@ class CreateUser(APIView):
         return Response(f'User {user["username"]} created, Token: {token}')
 
 class UserEnter(APIView):
+    """
+    Авторизация пользователя
+    """
     def post(self, request):
         data = request.data
         # username_check = User.objects.filter(username=data['email'])
@@ -73,6 +84,10 @@ class UserEnter(APIView):
         if user is None:
             return Response('Email or password is wrong')
         return Response('Login is allowed')
+
+class ProductAPI(ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
 

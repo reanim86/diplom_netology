@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from backend.views import UploadData, CreateUser, UserEnter
+from backend.views import UploadData, CreateUser, UserEnter, ProductAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload/', UploadData.as_view()),
     path('createuser/', CreateUser.as_view()),
-    path('enter/', UserEnter.as_view())
+    path('enter/', UserEnter.as_view()),
+    path('products/', ProductAPI.as_view())
 ]

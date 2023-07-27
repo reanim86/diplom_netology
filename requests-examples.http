@@ -5,7 +5,7 @@
 # Загрузить данные из магазина
 POST {{baseUrl}}/upload/
 Content-Type: application/json
-Authorization: Token 7ee336eb234e66946d2178a3349be2d26544b90e
+Authorization: Token d51638d2f34431708b9e1271744edde7a9a3c70f
 
 {
   "url": "http://gw36.a-don.ru:8181/platform/shop1.yaml"
@@ -39,3 +39,15 @@ Content-Type: application/json
   "email": "Nik@ya.ru",
   "password": "test"
 }
+
+###
+
+# Список всех товаров
+GET {{baseUrl}}/products/4216292
+Content-Type: application/json
+
+###
+
+# карточка товара
+GET {{baseUrl}}/api/productcard/4216292
+Content-Type: application/json

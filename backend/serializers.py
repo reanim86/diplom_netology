@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import Product, Category, ProductInfo
+from backend.models import Product, Category, ProductInfo, Shop, Parameter, ProductParameter
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -13,20 +13,53 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для модели Product
+    Сериализатор для модели Product выводит список товаров
     """
     category = CategorySerializer(read_only=True)
     class Meta:
         model = Product
         fields = ['id', 'name', 'category']
 
+class ShopSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели Shop
+    """
+    class Meta:
+        model = Shop
+        fields = ['name', 'url']
+
+class ParametrSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели Parametr
+    """
+    class Meta:
+        model = Parameter
+        fields = ['name']
+
+class ProductParameterSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели ProductParameter
+    """
+    parametr = ParametrSerializer(read_only=True)
+    class Meta:
+        model = ProductParameter
+        fields = ['parametr', 'value']
+
 class ProducrInfoSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели ProductInfo
+    """
+    shop = ShopSerializer(read_only=True)
+    productparameters = ProductParameterSerializer(read_only=True, many=True)
     class Meta:
         model = ProductInfo
-        fields = ['model', 'price', 'quantity']
+        fields = ['model', 'price', 'quantity', 'shop', 'productparameters']
 
 class ProductCardSerializer(serializers.ModelSerializer):
-    productinfos = ProducrInfoSerializer
+    """
+        Сериализатор для модели Product выводит характеристики товаров
+        """
+    productinfos = ProducrInfoSerializer(read_only=True, many=True)
     class Meta:
         model = Product
         fields = ['id', 'name', 'productinfos']

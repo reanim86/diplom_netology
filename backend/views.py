@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 
 from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User
+from backend.permissions import IsOwner
 from backend.serializers import ProductSerializer, ProductCardSerializer
 
 
@@ -73,28 +74,41 @@ class UserEnter(APIView):
     """
     def post(self, request):
         data = request.data
-        # username_check = User.objects.filter(username=data['email'])
-        # if username_check:
-        #     if check_password(data['password'], username_check[0].password):
-        #         return Response('Login is allowed')
-        #     else:
-        #         return Response('Wrong password')
-        # else:
-        #     return Response('User not found')
         user = authenticate(username=data['email'], password=data['password'])
         if user is None:
             return Response('Email or password is wrong')
         return Response('Login is allowed')
 
 class ProductAPI(ListAPIView):
+    """
+    Класс для просмотра списка товаров
+    """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+class ProductDetail(APIView):
+    """
+    Класс для просмотра карточки товара
+    """
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, id):
+        shop = request.GET.get('shop')
+        # проверка есть ли фильтр по магазину
+        if shop is None:
+            product = Product.objects.filter(pk=id)
+            ser = ProductCardSerializer(product, many=True)
+            return Response(ser.data)
+        product_all_shop = Product.objects.filter(pk=id, productinfos__shop__name=shop)
+        #убираем из списка записи с ненужными магазинами
 
-
-class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductCardSerializer
+        product = []
+        # for prod in ser:
+        #     if prod['productinfos']['shop']['name'] == shop:
+        #         product.append(prod)
+        ser = ProductCardSerializer(product_all_shop, many=True)
+        return Response(ser.data)
+        # print(request.GET.get('shop'))
+        # return Response('shop')
 
 
 

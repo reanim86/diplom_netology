@@ -18,10 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from backend.views import UploadData, CreateUser, UserEnter, ProductAPI, ProductViewSet
+from backend.views import UploadData, CreateUser, UserEnter, ProductAPI, ProductDetail
 
-router = DefaultRouter()
-router.register('productcard', ProductViewSet)
+# router = DefaultRouter()
+# router.register('productcard', ProductViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +29,6 @@ urlpatterns = [
     path('createuser/', CreateUser.as_view()),
     path('enter/', UserEnter.as_view()),
     path('products/', ProductAPI.as_view()),
-    path('api/', include(router.urls)),
+    # path('api/', include(router.urls)),
+    path('productcard/<int:id>/', ProductDetail.as_view())
 ]

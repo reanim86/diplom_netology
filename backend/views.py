@@ -14,7 +14,8 @@ from rest_framework.authtoken.models import Token
 
 from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User
 from backend.permissions import IsOwner
-from backend.serializers import ProductSerializer, ProductCardSerializer
+from backend.serializers import ProductSerializer, ProductCardSerializer, ProducrInfoSerializer, \
+    ProducrInfoShopPriceSerializer
 
 
 class UploadData(APIView):
@@ -98,17 +99,9 @@ class ProductDetail(APIView):
             product = Product.objects.filter(pk=id)
             ser = ProductCardSerializer(product, many=True)
             return Response(ser.data)
-        product_all_shop = Product.objects.filter(pk=id, productinfos__shop__name=shop)
-        #убираем из списка записи с ненужными магазинами
-
-        product = []
-        # for prod in ser:
-        #     if prod['productinfos']['shop']['name'] == shop:
-        #         product.append(prod)
-        ser = ProductCardSerializer(product_all_shop, many=True)
+        product_shop = ProductInfo.objects.filter(shop__name=shop, product_id=id)
+        ser = ProducrInfoShopPriceSerializer(product_shop, many=True)
         return Response(ser.data)
-        # print(request.GET.get('shop'))
-        # return Response('shop')
 
 
 

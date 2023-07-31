@@ -5,7 +5,7 @@
 # Загрузить данные из магазина
 POST {{baseUrl}}/upload/
 Content-Type: application/json
-Authorization: Token d51638d2f34431708b9e1271744edde7a9a3c70f
+Authorization: Token eed07228d3d1f3561ccf7d6c6e493e1380109331
 
 {
   "url": "http://gw36.a-don.ru:8181/platform/shop1.yaml"
@@ -21,7 +21,7 @@ Content-Type: application/json
   "surname": "Ivanov",
   "first_name": "Ivan",
   "last_name": "Ivanovich",
-  "email": "with@ya.ru",
+  "email": "Ivan@ya.ru",
   "password": "test",
   "confirm_password": "test",
   "company": "IP Ivanov",
@@ -36,18 +36,26 @@ POST {{baseUrl}}/enter/
 Content-Type: application/json
 
 {
-  "email": "Nik@ya.ru",
+  "email": "Ivan@ya.ru",
   "password": "test"
 }
 
 ###
 
 # Список всех товаров
-GET {{baseUrl}}/products/4216292
+GET {{baseUrl}}/products/
 Content-Type: application/json
 
 ###
 
 # карточка товара
-GET {{baseUrl}}/api/productcard/4216292
+GET {{baseUrl}}/productcard/4216313
 Content-Type: application/json
+Authorization: Token 6a52d4927e00cbbc33611f4403284fe3efcce2eb
+
+###
+
+# карточка товара с фильтром по магазину
+GET   {{baseUrl}}/productcard/4216313/?shop=Test
+Content-Type: application/json
+Authorization: Token 6a52d4927e00cbbc33611f4403284fe3efcce2eb

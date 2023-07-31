@@ -63,3 +63,15 @@ class ProductCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'productinfos']
+
+class ProducrInfoShopPriceSerializer(serializers.ModelSerializer):
+    """
+        Сериализатор для модели ProductInfo для вывода остатков и цена по определенному магазину определенного товара
+        """
+    shop = ShopSerializer(read_only=True)
+    productparameters = ProductParameterSerializer(read_only=True, many=True)
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = ProductInfo
+        fields = ['product', 'model', 'price', 'quantity', 'shop', 'productparameters']

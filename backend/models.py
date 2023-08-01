@@ -100,7 +100,7 @@ class User(AbstractUser):
 class Order(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
-    dt = models.DateField(default=django.utils.timezone.now, verbose_name='Дата создания')
+    dt = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     status = models.CharField(verbose_name='Статус', choices=STATE_CHOICES, max_length=15)
 
     class Meta:

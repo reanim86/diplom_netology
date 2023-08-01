@@ -83,3 +83,9 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['user', 'dt', 'status']
+        read_only_fields = ['user']
+
+    # def create(self, validated_data):
+    #     """Метод для создания"""
+    #     validated_data['user'] = self.context['request'].user
+    #     return super().create(validated_data)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import Product, Category, ProductInfo, Shop, Parameter, ProductParameter
+from backend.models import Product, Category, ProductInfo, Shop, Parameter, ProductParameter, Order
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -57,8 +57,8 @@ class ProducrInfoSerializer(serializers.ModelSerializer):
 
 class ProductCardSerializer(serializers.ModelSerializer):
     """
-        Сериализатор для модели Product выводит характеристики товаров
-        """
+    Сериализатор для модели Product выводит характеристики товаров
+    """
     productinfos = ProducrInfoSerializer(read_only=True, many=True)
     class Meta:
         model = Product
@@ -66,8 +66,8 @@ class ProductCardSerializer(serializers.ModelSerializer):
 
 class ProducrInfoShopPriceSerializer(serializers.ModelSerializer):
     """
-        Сериализатор для модели ProductInfo для вывода остатков и цена по определенному магазину определенного товара
-        """
+    Сериализатор для модели ProductInfo для вывода остатков и цена по определенному магазину определенного товара
+    """
     shop = ShopSerializer(read_only=True)
     productparameters = ProductParameterSerializer(read_only=True, many=True)
     product = ProductSerializer(read_only=True)
@@ -75,3 +75,11 @@ class ProducrInfoShopPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductInfo
         fields = ['product', 'model', 'price', 'quantity', 'shop', 'productparameters']
+
+class OrderSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели Order
+    """
+    class Meta:
+        model = Order
+        fields = ['user', 'dt', 'status']

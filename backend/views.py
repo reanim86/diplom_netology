@@ -12,10 +12,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 
-from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User
+from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User, Order
 from backend.permissions import IsOwner
 from backend.serializers import ProductSerializer, ProductCardSerializer, ProducrInfoSerializer, \
-    ProducrInfoShopPriceSerializer
+    ProducrInfoShopPriceSerializer, OrderSerializer
 
 
 class UploadData(APIView):
@@ -104,4 +104,9 @@ class ProductDetail(APIView):
         return Response(ser.data)
 
 
-
+class OrderViewSet(ModelViewSet):
+    """
+    Класс для работы с корзиной
+    """
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer

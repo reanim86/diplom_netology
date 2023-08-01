@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 
-from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User, Order
+from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User, Order, OrderItem
 from backend.permissions import IsOwner
 from backend.serializers import ProductSerializer, ProductCardSerializer, ProducrInfoSerializer, \
     ProducrInfoShopPriceSerializer, OrderSerializer
@@ -113,3 +113,11 @@ class OrderViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        orderitem = data.pop('orderitem')
+        order = Order.objects.create(user=self.request.user, **data)
+        OrderItem.objects.create(order=order, **orderitem)
+        # print(orderitem)
+        return Response('Ok')

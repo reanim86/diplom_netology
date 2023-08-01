@@ -5,7 +5,7 @@
 # Загрузить данные из магазина
 POST {{baseUrl}}/upload/
 Content-Type: application/json
-Authorization: Token eed07228d3d1f3561ccf7d6c6e493e1380109331
+Authorization: Token da7225be27ba71a1fab9259217b53915a2d9bbfd
 
 {
   "url": "http://gw36.a-don.ru:8181/platform/shop1.yaml"
@@ -51,11 +51,34 @@ Content-Type: application/json
 # карточка товара
 GET {{baseUrl}}/productcard/4216313
 Content-Type: application/json
-Authorization: Token 6a52d4927e00cbbc33611f4403284fe3efcce2eb
+Authorization: Token 8d16200cd1a1d5c8a9e7aa491f65908373f50ba2
 
 ###
 
 # карточка товара с фильтром по магазину
 GET   {{baseUrl}}/productcard/4216313/?shop=Test
 Content-Type: application/json
-Authorization: Token 6a52d4927e00cbbc33611f4403284fe3efcce2eb
+Authorization: Token 8d16200cd1a1d5c8a9e7aa491f65908373f50ba2
+
+###
+
+# Получение данных из корзины
+GET   {{baseUrl}}/api/basket/
+Content-Type: application/json
+
+###
+
+# Полодить в корзину товар с требуемыми значениями
+POST   {{baseUrl}}/api/basket/
+Content-Type: application/json
+Authorization: Token da7225be27ba71a1fab9259217b53915a2d9bbfd
+
+{
+  "status": "basket2",
+  "orderitem": {
+    "productinfo_id": {
+      "name_product": "Смартфон Apple iPhone XR 128GB (синий)"
+    },
+    "quantity": 4
+  }
+}

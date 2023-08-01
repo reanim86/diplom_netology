@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import Product, Category, ProductInfo, Shop, Parameter, ProductParameter, Order
+from backend.models import Product, Category, ProductInfo, Shop, Parameter, ProductParameter, Order, OrderItem
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -85,7 +85,15 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['user', 'dt', 'status']
         read_only_fields = ['user']
 
-    # def create(self, validated_data):
-    #     """Метод для создания"""
-    #     validated_data['user'] = self.context['request'].user
-    #     return super().create(validated_data)
+        # def create(self, validated_data):
+            # positions = validated_data.pop('positions')
+            # order = super().create(validated_data)
+            # for position in positions:
+            #     StockProduct.objects.create(
+            #         stock=stock,
+            #         product=position['product'],
+            #         quantity=position['quantity'],
+            #         price=position['price']
+            #     )
+            # OrderItem.objects.create(order_id=1, productinfo_id=1, quantity=1)
+            # return order

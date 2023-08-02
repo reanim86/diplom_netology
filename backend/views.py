@@ -27,7 +27,6 @@ class UploadData(APIView):
         url = request.data.get('url')
         stream = get(url).content
         data = yaml.safe_load(stream)
-        # pprint(data)
         shop = Shop.objects.get_or_create(name=data['shop'], user=request.user)
         for category in data['categories']:
             cat = Category.objects.get_or_create(id=category['id'], name=category['name'])
@@ -107,10 +106,20 @@ class OrderViews(APIView):
     """
     Класс для работы с моделью Order
     """
-    def get(self, request):
-        orders = Order.objects.filter(user=self.request.user)
-        ser = OrderSerializer(orders, many=True)
-        return Response(ser.data)
+    def get(self, request, id):
+        orders = Order.objects.filter(pk=id, user=self.request.user)
+        orderitems = OrderItem.objects.filter(order=orders[0])
+        order_info = []
+        full_amount = 0
+        for orderitem in orderitems:
+            productinfo = ProductInfo.objects.get(pk=orderitem.productinfo_id)
+            product = Product.objects.get(pk=productinfo.product_id)
+            shop = Shop.objects.get(pk=productinfo.shop_id)
+            order_info.append(f'Product {product.name} to shop {shop.name} quantity {orderitem.quantity} by price '
+                              f'{productinfo.price}, the amount {orderitem.quantity * productinfo.price}')
+            full_amount += orderitem.quantity * productinfo.price
+        full_info = {'products': order_info, 'full_amount': full_amount}
+        return Response(full_info)
 
     def post(self, request):
         order = Order.objects.create(user=self.request.user)
@@ -118,23 +127,39 @@ class OrderViews(APIView):
 
     def patch(self, request, id):
         order = Order.objects.get(pk=id)
-        if not (order.user == self.request.user):
+        if order.user != self.request.user:
             return Response('Wrong user')
         data = request.data
+        # Уменьшаем остаток в магазине на количество товара в заказе если клиент подвердил заказ
+        if (data['status'] == 'confirmed') and (order.status == 'new'):
+            orders = Order.objects.filter(pk=id, user=self.request.user)
+            orderitems = OrderItem.objects.filter(order=orders[0])
+            for orderitem in orderitems:
+                productinfo = ProductInfo.objects.get(pk=orderitem.productinfo_id)
+                ProductInfo.objects.filter(pk=orderitem.productinfo_id).update(
+                    quantity=(productinfo.quantity - orderitem.quantity)
+                )
+        # Увеличиваем остаток в магазине если заказ отменен
+        if (data['status'] == 'canceled') and not(order.status == 'new'):
+            orders = Order.objects.filter(pk=id, user=self.request.user)
+            orderitems = OrderItem.objects.filter(order=orders[0])
+            for orderitem in orderitems:
+                productinfo = ProductInfo.objects.get(pk=orderitem.productinfo_id)
+                ProductInfo.objects.filter(pk=orderitem.productinfo_id).update(
+                    quantity=(productinfo.quantity + orderitem.quantity)
+                )
         Order.objects.filter(pk=id).update(**data)
         order = Order.objects.get(pk=id)
         ser = OrderSerializer(order)
         return Response(ser.data)
 
 
-
-
-class Basket(ListAPIView):
+class Basket(APIView):
     """
     Класс для работы с корзиной
     """
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    # queryset = Order.objects.all()
+    # serializer_class = OrderSerializer
 
     def post(self, request):
         """
@@ -146,11 +171,31 @@ class Basket(ListAPIView):
         productinfos = ProductInfo.objects.filter(product__name=name['name_product'], shop__name=name['name_shop'])
         if productinfos[0].quantity < orderitem['quantity']:
             return Response('There is not enough product on the balance')
-        # order = Order.objects.create(user=self.request.user, **data)
-        OrderItem.objects.create(order=order, productinfo=productinfos[0], **orderitem)
-        # Уменьшаем остаток в магазине на указанное количество товара
-        # ProductInfo.objects.filter(product__name=name['name_product'], shop__name=name['name_shop']).update(
-        #     quantity=(productinfos[0].quantity - orderitem['quantity'])
-        # )
+        # Проверка что пользователь кладет в свою корзину
+        order = Order.objects.get(pk=orderitem["order_id"])
+        if order.user != self.request.user:
+            return Response("You can't put an item in this basket")
+        OrderItem.objects.create(productinfo=productinfos[0], **orderitem)
         return Response(f'Product {name["name_product"]}, в количестве {orderitem["quantity"]}, на сумму '
-                        f'{(orderitem["quantity"] * productinfos[0].price)} add to basket. Order ID')
+                        f'{(orderitem["quantity"] * productinfos[0].price)} add to basket. Order ID '
+                        f'{orderitem["order_id"]}')
+
+    def delete(self, request, id):
+        orderitem = OrderItem.objects.get(pk=id)
+        order = Order.objects.get(pk=orderitem.order_id)
+        if order.user != self.request.user:
+            return Response("You don't have permission")
+        orderitem.delete()
+        return Response(f'Record with ID {id} delete')
+
+    def patch(self, request, id):
+        data = request.data
+        orderitem = OrderItem.objects.get(pk=id)
+        order = Order.objects.get(pk=orderitem.order_id)
+        if order.user != self.request.user:
+            return Response("You don't have permission")
+        productinfo = ProductInfo.objects.get(pk=orderitem.productinfo_id)
+        if productinfo.quantity < data['quantity']:
+            return Response('There is not enough product on the balance')
+        OrderItem.objects.filter(pk=id).update(quantity=data['quantity'])
+        return Response(f'Quantity changed to {data["quantity"]}')

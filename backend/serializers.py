@@ -66,7 +66,7 @@ class ProductCardSerializer(serializers.ModelSerializer):
 
 class ProducrInfoShopPriceSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для модели ProductInfo для вывода остатков и цена по определенному магазину определенного товара
+    Сериализатор для модели ProductInfo для вывода остатков и цен по определенному магазину определенного товара
     """
     shop = ShopSerializer(read_only=True)
     productparameters = ProductParameterSerializer(read_only=True, many=True)
@@ -76,11 +76,20 @@ class ProducrInfoShopPriceSerializer(serializers.ModelSerializer):
         model = ProductInfo
         fields = ['product', 'model', 'price', 'quantity', 'shop', 'productparameters']
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели OrderItem
+    """
+    class Meta:
+        model = OrderItem
+        fields = ['productinfo', 'quantity']
+
 class OrderSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели Order
     """
+    orderitems = OrderItemSerializer(read_only=True, many=True)
     class Meta:
         model = Order
-        fields = ['user', 'dt', 'status']
+        fields = ['id', 'user', 'dt', 'status', 'orderitems']
         read_only_fields = ['user']

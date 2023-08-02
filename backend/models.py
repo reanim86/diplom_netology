@@ -10,12 +10,12 @@ class StateChoise(models.TextChoices):
     """
     Статусы заказов в корзине
     """
-    NEW = 'new', 'Новый'
-    CONFIRMED = 'confirmed', 'Подтвержден'
-    ASSAMBLED = 'assembled', 'Собран'
-    SENT = 'sent', 'Отправлен'
-    DELIVERED = 'delivered', 'Доставлен'
-    CANCELED = 'canceled', 'Отменен'
+    NEW = 'new'
+    CONFIRMED = 'confirmed'
+    ASSAMBLED = 'assembled'
+    SENT = 'sent'
+    DELIVERED = 'delivered'
+    CANCELED = 'canceled'
 
 
 class Shop(models.Model):

@@ -31,7 +31,8 @@ urlpatterns = [
     path('products/', ProductAPI.as_view()),
     # path('api/', include(router.urls)),
     path('productcard/<int:id>/', ProductDetail.as_view()),
+    path('basket/<int:id>/', Basket.as_view()),
     path('basket/', Basket.as_view()),
     path('order/', OrderViews.as_view()),
-    path('order/<int:id>/', OrderViews.as_view())
+    path('order/<int:id>/', OrderViews.as_view()),
 ]

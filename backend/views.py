@@ -103,21 +103,54 @@ class ProductDetail(APIView):
         ser = ProducrInfoShopPriceSerializer(product_shop, many=True)
         return Response(ser.data)
 
+class OrderViews(APIView):
+    """
+    Класс для работы с моделью Order
+    """
+    def get(self, request):
+        orders = Order.objects.filter(user=self.request.user)
+        ser = OrderSerializer(orders, many=True)
+        return Response(ser.data)
 
-class OrderViewSet(ModelViewSet):
+    def post(self, request):
+        order = Order.objects.create(user=self.request.user)
+        return Response(f'Create order with id {order.id}')
+
+    def patch(self, request, id):
+        order = Order.objects.get(pk=id)
+        if not (order.user == self.request.user):
+            return Response('Wrong user')
+        data = request.data
+        Order.objects.filter(pk=id).update(**data)
+        order = Order.objects.get(pk=id)
+        ser = OrderSerializer(order)
+        return Response(ser.data)
+
+
+
+
+class Basket(ListAPIView):
     """
     Класс для работы с корзиной
     """
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
+        """
+        Кладем товар в корзину
+        """
         data = request.data
         orderitem = data.pop('orderitem')
-        order = Order.objects.create(user=self.request.user, **data)
-        OrderItem.objects.create(order=order, **orderitem)
-        # print(orderitem)
-        return Response('Ok')
+        name = orderitem.pop('productinfo')
+        productinfos = ProductInfo.objects.filter(product__name=name['name_product'], shop__name=name['name_shop'])
+        if productinfos[0].quantity < orderitem['quantity']:
+            return Response('There is not enough product on the balance')
+        # order = Order.objects.create(user=self.request.user, **data)
+        OrderItem.objects.create(order=order, productinfo=productinfos[0], **orderitem)
+        # Уменьшаем остаток в магазине на указанное количество товара
+        # ProductInfo.objects.filter(product__name=name['name_product'], shop__name=name['name_shop']).update(
+        #     quantity=(productinfos[0].quantity - orderitem['quantity'])
+        # )
+        return Response(f'Product {name["name_product"]}, в количестве {orderitem["quantity"]}, на сумму '
+                        f'{(orderitem["quantity"] * productinfos[0].price)} add to basket. Order ID')

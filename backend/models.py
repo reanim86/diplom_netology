@@ -6,15 +6,17 @@ from django.db import models
 
 
 
-STATE_CHOICES = (
-    ('basket', 'Статус корзины'),
-    ('new', 'Новый'),
-    ('confirmed', 'Подтвержден'),
-    ('assembled', 'Собран'),
-    ('sent', 'Отправлен'),
-    ('delivered', 'Доставлен'),
-    ('canceled', 'Отменен'),
-)
+class StateChoise(models.TextChoices):
+    """
+    Статусы заказов в корзине
+    """
+    NEW = 'new', 'Новый'
+    CONFIRMED = 'confirmed', 'Подтвержден'
+    ASSAMBLED = 'assembled', 'Собран'
+    SENT = 'sent', 'Отправлен'
+    DELIVERED = 'delivered', 'Доставлен'
+    CANCELED = 'canceled', 'Отменен'
+
 
 class Shop(models.Model):
     name = models.CharField(max_length=50, verbose_name='Наименование магазина')
@@ -101,7 +103,7 @@ class Order(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     dt = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
-    status = models.CharField(verbose_name='Статус', choices=STATE_CHOICES, max_length=15)
+    status = models.TextField(choices=StateChoise.choices, default=StateChoise.NEW)
 
     class Meta:
         verbose_name = 'Заказ'

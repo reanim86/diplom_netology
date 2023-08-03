@@ -12,8 +12,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 
-from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User, Order, OrderItem
+from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User, Order, OrderItem, \
+    Contact
 from backend.permissions import IsOwner
+from backend.sendmail import send_email, text_to_admin, text_to_client
 from backend.serializers import ProductSerializer, ProductCardSerializer, ProducrInfoSerializer, \
     ProducrInfoShopPriceSerializer, OrderSerializer
 
@@ -111,6 +113,7 @@ class OrderViews(APIView):
         orderitems = OrderItem.objects.filter(order=orders[0])
         order_info = []
         full_amount = 0
+        user = User.objects.filter(username=self.request.user)
         for orderitem in orderitems:
             productinfo = ProductInfo.objects.get(pk=orderitem.productinfo_id)
             product = Product.objects.get(pk=productinfo.product_id)
@@ -118,7 +121,11 @@ class OrderViews(APIView):
             order_info.append(f'Product {product.name} to shop {shop.name} quantity {orderitem.quantity} by price '
                               f'{productinfo.price}, the amount {orderitem.quantity * productinfo.price}')
             full_amount += orderitem.quantity * productinfo.price
-        full_info = {'products': order_info, 'full_amount': full_amount}
+        full_info = {'id': orders[0].id, 'date': orders[0].dt,
+                     'status': orders[0].status, 'products': order_info,
+                     'full_amount': full_amount, 'surname': orders[0].surname,
+                     'first_name': user[0].first_name, 'last_name': user[0].last_name,
+                     'email':user[0].email}
         return Response(full_info)
 
     def post(self, request):
@@ -126,12 +133,25 @@ class OrderViews(APIView):
         return Response(f'Create order with id {order.id}')
 
     def patch(self, request, id):
+        admin_email = 'reanim86@yandex.ru'
         order = Order.objects.get(pk=id)
+        user = User.objects.filter(username=self.request.user)
+        # print(user[0].surname)
         if order.user != self.request.user:
             return Response('Wrong user')
         data = request.data
+        status = data.pop('status')
         # Уменьшаем остаток в магазине на количество товара в заказе если клиент подвердил заказ
-        if (data['status'] == 'confirmed') and (order.status == 'new'):
+        if (status == 'confirmed') and (order.status == 'new'):
+            # Создаем или получаем запись контакта куда отправлять заказ
+            type_contact = list(data.keys())
+            value_contact = list(data.values())
+            contact = Contact.objects.get_or_create(
+                type=type_contact[0],
+                user=self.request.user,
+                value=value_contact[0]
+            )
+
             orders = Order.objects.filter(pk=id, user=self.request.user)
             orderitems = OrderItem.objects.filter(order=orders[0])
             for orderitem in orderitems:
@@ -139,8 +159,29 @@ class OrderViews(APIView):
                 ProductInfo.objects.filter(pk=orderitem.productinfo_id).update(
                     quantity=(productinfo.quantity - orderitem.quantity)
                 )
+            text_admin = text_to_admin(
+                orderitems,
+                contact[0].type,
+                contact[0].value,
+                user[0].surname,
+                user[0].first_name,
+                user[0].last_name,
+                user[0].email
+            )
+            send_email(admin_email, f'Accept order {id}', text_admin)
+            text_client = text_to_client(
+                id,
+                orderitems,
+                contact[0].type,
+                contact[0].value,
+                user[0].surname,
+                user[0].first_name,
+                user[0].last_name,
+                user[0].email
+            )
+            send_email(user[0].email, 'Thank you for your order', text_client)
         # Увеличиваем остаток в магазине если заказ отменен
-        if (data['status'] == 'canceled') and not(order.status == 'new'):
+        if (status == 'canceled') and (order.status != 'new'):
             orders = Order.objects.filter(pk=id, user=self.request.user)
             orderitems = OrderItem.objects.filter(order=orders[0])
             for orderitem in orderitems:
@@ -148,7 +189,7 @@ class OrderViews(APIView):
                 ProductInfo.objects.filter(pk=orderitem.productinfo_id).update(
                     quantity=(productinfo.quantity + orderitem.quantity)
                 )
-        Order.objects.filter(pk=id).update(**data)
+        Order.objects.filter(pk=id).update(status=status)
         order = Order.objects.get(pk=id)
         ser = OrderSerializer(order)
         return Response(ser.data)
@@ -158,9 +199,6 @@ class Basket(APIView):
     """
     Класс для работы с корзиной
     """
-    # queryset = Order.objects.all()
-    # serializer_class = OrderSerializer
-
     def post(self, request):
         """
         Кладем товар в корзину

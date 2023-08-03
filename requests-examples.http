@@ -5,7 +5,7 @@
 # Загрузить данные из магазина
 POST {{baseUrl}}/upload/
 Content-Type: application/json
-Authorization: Token da7225be27ba71a1fab9259217b53915a2d9bbfd
+Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
 
 {
   "url": "http://gw36.a-don.ru:8181/platform/shop1.yaml"
@@ -21,7 +21,7 @@ Content-Type: application/json
   "surname": "Ivanov",
   "first_name": "Ivan",
   "last_name": "Ivanovich",
-  "email": "Ivan@ya.ru",
+  "email": "Iva@ya.ru",
   "password": "test",
   "confirm_password": "test",
   "company": "IP Ivanov",
@@ -51,34 +51,73 @@ Content-Type: application/json
 # карточка товара
 GET {{baseUrl}}/productcard/4216313
 Content-Type: application/json
-Authorization: Token 8d16200cd1a1d5c8a9e7aa491f65908373f50ba2
+Authorization: Token 792e208807fc178be958c8773507828b8be5e8ce
 
 ###
 
 # карточка товара с фильтром по магазину
-GET   {{baseUrl}}/productcard/4216313/?shop=Test
+GET   {{baseUrl}}/productcard/4216313/?shop=Связной
 Content-Type: application/json
-Authorization: Token 8d16200cd1a1d5c8a9e7aa491f65908373f50ba2
+Authorization: Token 792e208807fc178be958c8773507828b8be5e8ce
 
 ###
 
-# Получение данных из корзины
-GET   {{baseUrl}}/api/basket/
+# Создать заказ
+POST {{baseUrl}}/order/
 Content-Type: application/json
+Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
 
 ###
 
-# Полодить в корзину товар с требуемыми значениями
-POST   {{baseUrl}}/api/basket/
+# Посмотреть заказ
+GET {{baseUrl}}/order/2/
 Content-Type: application/json
-Authorization: Token da7225be27ba71a1fab9259217b53915a2d9bbfd
+Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+
+###
+
+# Изменение статуса заказа
+PATCH {{baseUrl}}/order/2/
+Content-Type: application/json
+Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
 
 {
-  "status": "basket2",
+  "status": "canceled"
+}
+
+
+###
+
+# Положить в корзину товар с требуемыми значениями
+POST   {{baseUrl}}/basket/
+Content-Type: application/json
+Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+
+{
   "orderitem": {
-    "productinfo_id": {
-      "name_product": "Смартфон Apple iPhone XR 128GB (синий)"
+    "order_id": 2,
+    "productinfo": {
+      "name_product": "Смартфон Apple iPhone XR 256GB (красный)",
+      "name_shop": "Связной"
     },
-    "quantity": 4
+    "quantity": 2
   }
+}
+
+###
+
+# Удалить товар из корзины
+DELETE {{baseUrl}}/basket/2/
+Content-Type: application/json
+Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+
+###
+
+# Изменить количество товара в корзине
+PATCH  {{baseUrl}}/basket/5/
+Content-Type: application/json
+Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+
+{
+  "quantity": 1
 }

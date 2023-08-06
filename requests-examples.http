@@ -5,7 +5,7 @@
 # Загрузить данные из магазина
 POST {{baseUrl}}/upload/
 Content-Type: application/json
-Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+Authorization: Token ca76b41ed7c593b37d2dbc473ae56b54cbb533ce
 
 {
   "url": "http://gw36.a-don.ru:8181/platform/shop1.yaml"
@@ -18,10 +18,10 @@ POST  {{baseUrl}}/createuser/
 Content-Type: application/json
 
 {
-  "surname": "Ivanov",
-  "first_name": "Ivan",
+  "surname": "kudinov",
+  "first_name": "Aleksei",
   "last_name": "Ivanovich",
-  "email": "Iva@ya.ru",
+  "email": "a.kudinov@a-don.ru",
   "password": "test",
   "confirm_password": "test",
   "company": "IP Ivanov",
@@ -65,24 +65,25 @@ Authorization: Token 792e208807fc178be958c8773507828b8be5e8ce
 # Создать заказ
 POST {{baseUrl}}/order/
 Content-Type: application/json
-Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+Authorization: Token bd3cb65a6792490b22dcd8a524c42538a7f38553
 
 ###
 
 # Посмотреть заказ
-GET {{baseUrl}}/order/2/
+GET {{baseUrl}}/order/1/
 Content-Type: application/json
-Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+Authorization: Token ca76b41ed7c593b37d2dbc473ae56b54cbb533ce
 
 ###
 
 # Изменение статуса заказа
-PATCH {{baseUrl}}/order/2/
+PATCH {{baseUrl}}/order/1/
 Content-Type: application/json
-Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+Authorization: Token ca76b41ed7c593b37d2dbc473ae56b54cbb533ce
 
 {
-  "status": "canceled"
+  "status": "canceled",
+  "adress": "Moscow"
 }
 
 
@@ -91,16 +92,16 @@ Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
 # Положить в корзину товар с требуемыми значениями
 POST   {{baseUrl}}/basket/
 Content-Type: application/json
-Authorization: Token aa233d4314397c16eacb0bf09d1a139864a4ffa1
+Authorization: Token bd3cb65a6792490b22dcd8a524c42538a7f38553
 
 {
   "orderitem": {
-    "order_id": 2,
+    "order_id": 3,
     "productinfo": {
-      "name_product": "Смартфон Apple iPhone XR 256GB (красный)",
+      "name_product": "Смартфон Apple iPhone XS Max 512GB (золотистый)",
       "name_shop": "Связной"
     },
-    "quantity": 2
+    "quantity": 1
   }
 }
 

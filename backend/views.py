@@ -1,12 +1,8 @@
-from pprint import pprint
-import urllib.request
+
 import yaml
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth import authenticate
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
-from yaml import load as load_yaml, Loader
 from requests import get
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,7 +10,6 @@ from rest_framework.authtoken.models import Token
 
 from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User, Order, OrderItem, \
     Contact
-from backend.permissions import IsOwner
 from backend.sendmail import send_email, text_to_admin, text_to_client
 from backend.serializers import ProductSerializer, ProductCardSerializer, ProducrInfoSerializer, \
     ProducrInfoShopPriceSerializer, OrderSerializer
@@ -136,7 +131,6 @@ class OrderViews(APIView):
         admin_email = 'reanim86@yandex.ru'
         order = Order.objects.get(pk=id)
         user = User.objects.filter(username=self.request.user)
-        # print(user[0].surname)
         if order.user != self.request.user:
             return Response('Wrong user')
         data = request.data

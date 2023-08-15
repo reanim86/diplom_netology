@@ -7,6 +7,7 @@ from requests import get
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
+from rest_framework.viewsets import ModelViewSet
 
 from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, User, Order, OrderItem, \
     Contact
@@ -76,12 +77,13 @@ class UserEnter(APIView):
             return Response('Email or password is wrong')
         return Response('Login is allowed')
 
-class ProductAPI(ListAPIView):
+class ProductAPI(ModelViewSet):
     """
     Класс для просмотра списка товаров
     """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    http_method_names = ['get']
 
 class ProductDetail(APIView):
     """

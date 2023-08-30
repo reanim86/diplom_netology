@@ -5,7 +5,7 @@
 # Загрузить данные из магазина
 POST {{baseUrl}}/upload/
 Content-Type: application/json
-Authorization: Token ca76b41ed7c593b37d2dbc473ae56b54cbb533ce
+Authorization: Token 25bfb9add08bd82725f126a6db0b502a7b1f3807
 
 {
   "url": "http://gw36.a-don.ru:8181/platform/shop1.yaml"
@@ -43,7 +43,13 @@ Content-Type: application/json
 ###
 
 # Список всех товаров
-GET {{baseUrl}}/products/
+GET {{baseUrl}}/api/products/
+Content-Type: application/json
+
+###
+
+# Укороченная карточка товара
+GET  {{baseUrl}}/api/products/4216292
 Content-Type: application/json
 
 ###
@@ -51,7 +57,7 @@ Content-Type: application/json
 # карточка товара
 GET {{baseUrl}}/productcard/4216313
 Content-Type: application/json
-Authorization: Token 792e208807fc178be958c8773507828b8be5e8ce
+Authorization: Token 25bfb9add08bd82725f126a6db0b502a7b1f3807
 
 ###
 

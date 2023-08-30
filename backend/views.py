@@ -1,7 +1,6 @@
 
 import yaml
 from django.contrib.auth import authenticate
-from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from requests import get
 from rest_framework.response import Response

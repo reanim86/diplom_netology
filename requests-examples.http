@@ -5,7 +5,7 @@
 # Загрузить данные из магазина
 POST {{baseUrl}}/upload/
 Content-Type: application/json
-Authorization: Token 25bfb9add08bd82725f126a6db0b502a7b1f3807
+Authorization: Token 47d0d0b420d1a9befc727e4f5811f4eb9e97cddb
 
 {
   "url": "http://gw36.a-don.ru:8181/platform/shop1.yaml"
